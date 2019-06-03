@@ -81,7 +81,7 @@ public class HomeController {
     
     @PutMapping("/secured/users")
     public CustomAdminResponse updateUserByEmail(@RequestBody Users updatedUser) {
-    	if(updatedUser.getId() < 1) {
+    	if(updatedUser.getId() < 1 || updatedUser == null) {
        	 	
     		return new CustomAdminResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST, "User id not present");
 

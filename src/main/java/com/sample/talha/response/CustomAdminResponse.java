@@ -6,14 +6,14 @@ public class CustomAdminResponse {
 
 	private HttpStatus statusCode;
 	private int value;
-	private String responseType;
+	private String response;
 	
 	
 	
-	public CustomAdminResponse(int value, HttpStatus statusCode, String responseType) {
+	public CustomAdminResponse(int value, HttpStatus statusCode, String response) {
 		this.statusCode = statusCode;
 		this.value = value;
-		this.responseType = responseType;
+		this.response = response;
 	}
 	public HttpStatus getStatusCode() {
 		return statusCode;
@@ -27,11 +27,11 @@ public class CustomAdminResponse {
 	public void setMessage(int value) {
 		this.value = value;
 	}
-	public String getResponseType() {
-		return responseType;
+	public String getResponse() {
+		return response;
 	}
-	public void setResponseType(String responseType) {
-		this.responseType = responseType;
+	public void setResponse(String response) {
+		this.response = response;
 	}
 	
 	
