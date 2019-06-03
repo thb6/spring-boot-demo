@@ -1,7 +1,5 @@
 package com.sample.talha.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +23,8 @@ import com.sample.talha.service.PointService;
 import com.sample.talha.service.PolygonService;
 import com.sample.talha.service.UserService;
 
+import io.swagger.annotations.ApiOperation;
+
 
 @RestController
 @RequestMapping("/rest")
@@ -40,13 +40,14 @@ public class HomeController {
 	private PointService pointService;
 	
 	
+	@ApiOperation(value = "Get List of Users")
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/secured/users")
     public ResponseEntity getUsers() {
     	return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
     }
     
-   // @PreAuthorize("hasAnyRole('ADMIN')")
+	@ApiOperation(value = "Create a user")
     @PostMapping("/secured/users")
     public CustomAdminResponse createUser(@RequestBody Users user) {
     	if(user == null) {
@@ -56,7 +57,7 @@ public class HomeController {
     	return new CustomAdminResponse(HttpStatus.OK.value(), HttpStatus.OK, "User Created Successfully");
     }
     
- // @PreAuthorize("hasAnyRole('ADMIN')")
+	@ApiOperation(value = "Get User by ID")
     @GetMapping("/secured/users/{id}")
     public ResponseEntity getUserById(@PathVariable("id")int id) {
     	
@@ -68,6 +69,7 @@ public class HomeController {
     	}
     }
     
+	@ApiOperation(value = "Get User by Email")
     @RequestMapping(value = "/secured/users/", params="email", method = RequestMethod.GET)
     public ResponseEntity getUserByEmail(@RequestParam("email") String email) {
     	
@@ -79,6 +81,7 @@ public class HomeController {
     	}
     }
     
+	@ApiOperation(value = "Update User")
     @PutMapping("/secured/users")
     public CustomAdminResponse updateUserByEmail(@RequestBody Users updatedUser) {
     	if(updatedUser.getId() < 1 || updatedUser == null) {
@@ -91,7 +94,7 @@ public class HomeController {
 
     	
     }
- // @PreAuthorize("hasAnyRole('ADMIN')")
+	@ApiOperation(value = "Delete User By ID")
     @DeleteMapping("/secured/users/{id}")
     public CustomAdminResponse deleteUserById(@PathVariable("id")int id) {
     	 userService.deleteUserById(id);
@@ -103,6 +106,7 @@ public class HomeController {
      * Polygons begin
      */
 
+	@ApiOperation(value = "Get Polygon by ID")
     @GetMapping("/secured/polygon/{id}")
     public ResponseEntity getPolygonById(@PathVariable("id")int id) {
     	Polygon polygon = polygonService.getPolygonById(id);
@@ -112,6 +116,7 @@ public class HomeController {
     	return new ResponseEntity<>(polygon, HttpStatus.OK);
     }
     
+	@ApiOperation(value = "Create a Polygon")
     @PostMapping("/secured/polygon")
     public CustomAdminResponse createPolygon(@RequestBody Polygon polygon) {
     	if(polygon == null) {
@@ -121,6 +126,7 @@ public class HomeController {
     	return new CustomAdminResponse(HttpStatus.OK.value(), HttpStatus.OK, "Polygon Created Successfully");
     }
     
+	@ApiOperation(value = "Check if given Polygon contains given Point")
     @GetMapping("secured/polygon/{polygonId}/{pointId}")
     public ResponseEntity doesContain(@PathVariable("polygonId") int polygonId, @PathVariable("pointId") int pointId) {
     	return new ResponseEntity<>(polygonService.doesContain(polygonId, pointId), HttpStatus.OK);
@@ -130,6 +136,7 @@ public class HomeController {
      * Points begin
      */
    
+	@ApiOperation(value = "Get Point by ID")
     @GetMapping("/secured/point/{id}")
     public ResponseEntity getPointById(@PathVariable("id")int id) {
     	Point point =  pointService.getPointById(id);
@@ -139,6 +146,7 @@ public class HomeController {
     	return new ResponseEntity<>(point, HttpStatus.OK);
     }
     
+	@ApiOperation(value = "Create Point")
     @PostMapping("/secured/point")
     public CustomAdminResponse createPolygon(@RequestBody Point point) {
     	if(point == null) {
