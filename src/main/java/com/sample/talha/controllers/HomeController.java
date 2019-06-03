@@ -3,6 +3,8 @@ package com.sample.talha.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sample.talha.entities.Point;
 import com.sample.talha.entities.Polygon;
 import com.sample.talha.entities.Users;
+import com.sample.talha.response.CustomAdminResponse;
 import com.sample.talha.service.PointService;
 import com.sample.talha.service.PolygonService;
 import com.sample.talha.service.UserService;
@@ -39,36 +42,60 @@ public class HomeController {
 	
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/secured/users")
-    public List<Users> getUsers() {
-    	return userService.getUsers();
+    public ResponseEntity getUsers() {
+    	return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
     }
     
    // @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/secured/users")
-    public List<Users> createUser(@RequestBody Users user) {
+    public CustomAdminResponse createUser(@RequestBody Users user) {
+    	if(user == null) {
+        	return new CustomAdminResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST, "User is null");
+    	}
     	userService.save(user);
-    	return userService.getUsers();
+    	return new CustomAdminResponse(HttpStatus.OK.value(), HttpStatus.OK, "User Created Successfully");
     }
     
  // @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/secured/users/{id}")
-    public Users getUserById(@PathVariable("id")int id) {
-    	return userService.getUserById(id);
+    public ResponseEntity getUserById(@PathVariable("id")int id) {
+    	
+    	Users user = userService.getUserById(id);
+    	if(user != null) {
+        	return new ResponseEntity<>(user, HttpStatus.OK);
+    	} else {
+    		return new ResponseEntity<> ("No user with that id exists", HttpStatus.BAD_REQUEST);
+    	}
     }
     
     @RequestMapping(value = "/secured/users/", params="email", method = RequestMethod.GET)
-    public Users getUserByEmail(@RequestParam("email") String email) {
-    	return userService.getUserByEmail(email);
+    public ResponseEntity getUserByEmail(@RequestParam("email") String email) {
+    	
+    	Users user = userService.getUserByEmail(email);
+    	if(user != null) {
+    	return new ResponseEntity<>(user, HttpStatus.OK);
+    	} else {
+    		return new ResponseEntity<> ("No user with that email exists", HttpStatus.BAD_REQUEST);
+    	}
     }
     
     @PutMapping("/secured/users")
-    public void updateUserByEmail(@RequestBody Users updatedUser) {
+    public CustomAdminResponse updateUserByEmail(@RequestBody Users updatedUser) {
+    	if(updatedUser.getId() < 1) {
+       	 	
+    		return new CustomAdminResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST, "User id not present");
+
+    	}
     	userService.updateUserByEmail(updatedUser);
+   	 	return new CustomAdminResponse(HttpStatus.OK.value(), HttpStatus.OK, "User Updated Successfully");
+
+    	
     }
  // @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/secured/users/{id}")
-    public void deleteUserById(@PathVariable("id")int id) {
+    public CustomAdminResponse deleteUserById(@PathVariable("id")int id) {
     	 userService.deleteUserById(id);
+    	 return new CustomAdminResponse(HttpStatus.OK.value(), HttpStatus.OK, "User Deleted Successfully");
     }
     
     
@@ -77,18 +104,26 @@ public class HomeController {
      */
 
     @GetMapping("/secured/polygon/{id}")
-    public Polygon getPolygonById(@PathVariable("id")int id) {
-    	return polygonService.getPolygonById(id);
+    public ResponseEntity getPolygonById(@PathVariable("id")int id) {
+    	Polygon polygon = polygonService.getPolygonById(id);
+    	if(polygon == null) {
+    		return new ResponseEntity<>("No Polygon By That ID", HttpStatus.BAD_REQUEST);
+    	}
+    	return new ResponseEntity<>(polygon, HttpStatus.OK);
     }
     
     @PostMapping("/secured/polygon")
-    public void createPolygon(@RequestBody Polygon polygon) {
+    public CustomAdminResponse createPolygon(@RequestBody Polygon polygon) {
+    	if(polygon == null) {
+    		return new CustomAdminResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST, "You did not provide a polygon");
+    	}
     	polygonService.save(polygon);
+    	return new CustomAdminResponse(HttpStatus.OK.value(), HttpStatus.OK, "Polygon Created Successfully");
     }
     
     @GetMapping("secured/polygon/{polygonId}/{pointId}")
-    public boolean doesContain(@PathVariable("polygonId") int polygonId, @PathVariable("pointId") int pointId) {
-    	return polygonService.doesContain(polygonId, pointId);
+    public ResponseEntity doesContain(@PathVariable("polygonId") int polygonId, @PathVariable("pointId") int pointId) {
+    	return new ResponseEntity<>(polygonService.doesContain(polygonId, pointId), HttpStatus.OK);
     }
     
     /*
@@ -96,12 +131,22 @@ public class HomeController {
      */
    
     @GetMapping("/secured/point/{id}")
-    public Point getPointById(@PathVariable("id")int id) {
-    	return pointService.getPointById(id);
+    public ResponseEntity getPointById(@PathVariable("id")int id) {
+    	Point point =  pointService.getPointById(id);
+    	if(point == null) {
+    		return new ResponseEntity<>("No point By That ID", HttpStatus.BAD_REQUEST);
+    	}
+    	return new ResponseEntity<>(point, HttpStatus.OK);
     }
     
     @PostMapping("/secured/point")
-    public void createPolygon(@RequestBody Point point) {
+    public CustomAdminResponse createPolygon(@RequestBody Point point) {
+    	if(point == null) {
+    		return new CustomAdminResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST, "You did not provide a point");
+    	}
     	pointService.save(point);
+    	return new CustomAdminResponse(HttpStatus.OK.value(), HttpStatus.OK, "Point Created Successfully");
+
+    	
     }
 }
